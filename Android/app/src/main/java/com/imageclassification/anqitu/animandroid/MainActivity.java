@@ -1,29 +1,23 @@
 package com.imageclassification.anqitu.animandroid;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.imageclassification.anqitu.animandroid.Model.Classification;
 import com.imageclassification.anqitu.animandroid.Model.Classifier;
 import com.imageclassification.anqitu.animandroid.Model.ImageClassifier;
-import com.wonderkiln.camerakit.CameraKitError;
-import com.wonderkiln.camerakit.CameraKitEvent;
-import com.wonderkiln.camerakit.CameraKitEventListener;
-import com.wonderkiln.camerakit.CameraKitImage;
-import com.wonderkiln.camerakit.CameraKitVideo;
-import com.wonderkiln.camerakit.CameraView;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int INPUT_SIZE = 150;
     private static final int IMAGE_MEAN = 117;
@@ -41,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private TextView textViewResult;
-    private Button btnDetectObject, btnToggleCamera, btnClearScreen;
+    private Button btnDetectObject, btnTakePhoto, btnClearScreen;
     private ImageView imageView;
 
 
@@ -53,11 +47,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         imageView = findViewById(R.id.imageView);
         textViewResult = findViewById(R.id.textViewResult);
-        btnToggleCamera = findViewById(R.id.btnToggleCamera);
+        btnTakePhoto = findViewById(R.id.btnTakePhoto);
         btnDetectObject = findViewById(R.id.btnDetectObject);
-        btnClearScreen = findViewById(R.id.btnClearScreen);
-        initTensorFlowAndLoadModel();
 
+        btnTakePhoto.setOnClickListener(this);
+        btnDetectObject.setOnClickListener(this);
+
+        initTensorFlowAndLoadModel();
+        makeButtonVisible();
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        Bitmap bitmap = (Bitmap)data.getExtras().get("data");
+        imageView.setImageBitmap((bitmap));
+        System.out.println("imageView is set with bitmap of taken photo");
     }
 
 
@@ -67,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    Classifier classifier = ImageClassifier.create(getAssets(), MODEL_FILE,
+                     classifier = ImageClassifier.create(getAssets(), MODEL_FILE,
                             LABEL_FILE, INPUT_SIZE, IMAGE_MEAN, IMAGE_STD, INPUT_NAME, OUTPUT_NAME);
                     makeButtonVisible();
                 } catch (final Exception e) {
@@ -84,5 +89,29 @@ public class MainActivity extends AppCompatActivity {
                 btnDetectObject.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btnTakePhoto) {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, 0);
+            textViewResult.setText("");
+
+        } else if (view.getId() == R.id.btnDetectObject) {
+            BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+
+            String text = "";
+
+            final Classification res = classifier.recognizeImage(bitmap);
+            if (res.getLabel() == null) {
+                text += ": ?\n";
+            } else {
+                text += String.format("%s (Similarity: %f)", res.getLabel(), res.getConf());
+            }
+            textViewResult.setText(text);
+        }
+
     }
 }

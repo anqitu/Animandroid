@@ -3,6 +3,7 @@
     package="com.imageclassification.anqitu.animandroid">
 
     <uses-feature android:name="android.hardware.camera"></uses-feature>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"

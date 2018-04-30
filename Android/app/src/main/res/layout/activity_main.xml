@@ -24,9 +24,11 @@
         android:gravity="center"
         android:maxLines="15"
         android:scrollbars="vertical"
+        android:textAlignment="center"
         android:textColor="@android:color/black"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -37,7 +39,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="#94bdcb"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@+id/textViewResult"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -54,18 +60,20 @@
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewResult">
 
 
         <Button
-            android:id="@+id/btnToggleCamera"
+            android:id="@+id/btnTakePhoto"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:text="Toggle"
+            android:text="Take Photo"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -84,21 +92,8 @@
             android:text="Detect"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
-            app:layout_constraintBaseline_toBaselineOf="@+id/btnToggleCamera"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btnTakePhoto"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/btnClearScreen"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom|center"
-            android:layout_marginBottom="2dp"
-            android:layout_weight="1"
-            android:text="Clear"
-            android:textAllCaps="false"
-            android:textColor="@android:color/black"
-            app:layout_constraintBaseline_toBaselineOf="@+id/btnToggleCamera"
-            app:layout_constraintEnd_toEndOf="parent" />
 
     </LinearLayout>
 
