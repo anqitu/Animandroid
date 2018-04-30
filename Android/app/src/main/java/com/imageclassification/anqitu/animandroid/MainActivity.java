@@ -20,22 +20,24 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int INPUT_SIZE = 150;
-    private static final int IMAGE_MEAN = 117;
-    private static final float IMAGE_STD = 1;
+//    private static final int IMAGE_MEAN = 117;
+//    private static final float IMAGE_STD = 1;
+
     private static final String INPUT_NAME = "input_1";
     private static final String OUTPUT_NAME = "dense_2/Softmax";
-
     private static final String MODEL_FILE = "file:///android_asset/opt_VGG16_animal_ver1.pb";
+    private static final String LABEL_FILE = "file:///android_asset/label_ver1.txt";
+
+//    private static final String INPUT_NAME = "conv2d_1_input";
+//    private static final String OUTPUT_NAME = "dense_2/Softmax";
 //    private static final String MODEL_FILE = "file:///android_asset/opt_mnist_convnet.pb";
-    private static final String LABEL_FILE =
-        "file:///android_asset/label_ver1.txt";
-//            "file:///android_asset/label_ver2.txt";
+//    private static final String LABEL_FILE = "file:///android_asset/labels.txt";
 
     private Classifier classifier;
 
     private Executor executor = Executors.newSingleThreadExecutor();
     private TextView textViewResult;
-    private Button btnDetectObject, btnTakePhoto, btnClearScreen;
+    private Button btnDetectObject, btnTakePhoto;
     private ImageView imageView;
 
 
@@ -73,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 try {
                      classifier = ImageClassifier.create(getAssets(), MODEL_FILE,
-                            LABEL_FILE, INPUT_SIZE, IMAGE_MEAN, IMAGE_STD, INPUT_NAME, OUTPUT_NAME);
+                            LABEL_FILE, INPUT_SIZE, INPUT_NAME, OUTPUT_NAME);
+//                            LABEL_FILE, INPUT_SIZE, IMAGE_MEAN, IMAGE_STD, INPUT_NAME, OUTPUT_NAME);
                     makeButtonVisible();
                 } catch (final Exception e) {
                     throw new RuntimeException("Error initializing Model!", e);

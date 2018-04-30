@@ -56,8 +56,8 @@ public class ImageClassifier implements Classifier {
      * @param modelFilename The filepath of the model GraphDef protocol buffer.
      * @param labelFilename The filepath of label file for classes.
      * @param inputSize The input size. A square image of inputSize x inputSize is assumed.
-     * @param imageMean The assumed mean of the image values.
-     * @param imageStd The assumed std of the image values.
+//     * @param imageMean The assumed mean of the image values.
+//     * @param imageStd The assumed std of the image values.
      * @param inputName The label of the image input node.
      * @param outputName The label of the output node.
      * @throws IOException
@@ -67,8 +67,8 @@ public class ImageClassifier implements Classifier {
             String modelFilename,
             String labelFilename,
             int inputSize,
-            int imageMean,
-            float imageStd,
+//            int imageMean,
+//            float imageStd,
             String inputName,
             String outputName) {
         ImageClassifier c = new ImageClassifier();
@@ -76,7 +76,6 @@ public class ImageClassifier implements Classifier {
         c.outputName = outputName;
 
         // Read the label names into memory.
-        // TODO(andrewharp): make this handle non-assets.
         String actualFilename = labelFilename.split("file:///android_asset/")[1];
         Log.i(TAG, "Reading labels from: " + actualFilename);
         BufferedReader br = null;
@@ -117,33 +116,30 @@ public class ImageClassifier implements Classifier {
 
     @Override
     public Classification recognizeImage(Bitmap bitmap) {
-//        ByteBuffer byteBuffer = convertBitmapToByteBuffer(bitmap);
-////        byte[][] result = new byte[1][labels.size()];
-//////        inferenceInterface.run(byteBuffer, result);
-//////        return getSortedResult(result);
-////        return null;
-        // Log this method so that it can be analyzed with systrace.
         Trace.beginSection("recognizeImage");
 
         Trace.beginSection("preprocessBitmap");
-        // Preprocess the image data from 0-255 int to normalized float based
-        // on the provided parameters.
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
         for (int i = 0; i < intValues.length; ++i) {
             final int val = intValues[i];
+            System.out.println(val);
 //            floatValues[i * 3 + 0] = (((val >> 16) & 0xFF) - imageMean) / imageStd;
 //            floatValues[i * 3 + 1] = (((val >> 8) & 0xFF) - imageMean) / imageStd;
 //            floatValues[i * 3 + 2] = ((val & 0xFF) - imageMean) / imageStd;
 
-            pixels[i * 3 + 0] = ((val >> 16) & 0xFF) / 255;
-            pixels[i * 3 + 1] = ((val >> 8) & 0xFF) / 255;
-            pixels[i * 3 + 2] = (val & 0xFF) / 255;
+            pixels[i * 3 + 0] = (((val >> 16) & 0xFF) / 255.0f);
+            pixels[i * 3 + 1] = (((val >> 8) & 0xFF) / 255.0f);
+            pixels[i * 3 + 2] = ((val & 0xFF) / 255.0f);
+
+            System.out.println(pixels[i * 3 + 0]);
         }
+
         Trace.endSection();
 
         // Copy the input data into TensorFlow.
         Trace.beginSection("feed");
         inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 3);
+//        inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 1);
         Trace.endSection();
 
         // Run the inference call.
@@ -172,7 +168,7 @@ public class ImageClassifier implements Classifier {
     @Override
     public void close() {
         inferenceInterface.close();
-//        inferenceInterface = null;
+        inferenceInterface = null;
     }
 
 //    private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
