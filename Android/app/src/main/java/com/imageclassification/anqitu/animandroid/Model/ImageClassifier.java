@@ -110,33 +110,20 @@ public class ImageClassifier implements Classifier {
         Trace.beginSection("recognizeImage");
 
         Trace.beginSection("preprocessBitmap");
-
-        System.out.println("bitmap.getWidth()");
-        System.out.println(bitmap.getWidth());
-        System.out.println("bitmap.getHeight()");
-        System.out.println(bitmap.getHeight());
-
         try {
             bitmap = getResizedBitmap(bitmap, 150, 150);
             bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
             for (int i = 0; i < intValues.length; ++i) {
                 final int val = intValues[i];
-//                System.out.println(val);
-
                 pixels[i * 3 + 0] = (((val >> 16) & 0xFF) / 255.0f);
                 pixels[i * 3 + 1] = (((val >> 8) & 0xFF) / 255.0f);
                 pixels[i * 3 + 2] = ((val & 0xFF) / 255.0f);
-
-//                System.out.println(pixels[i * 3 + 0]);
             }
-
-
             Trace.endSection();
 
             // Copy the input data into TensorFlow.
             Trace.beginSection("feed");
             inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 3);
-    //        inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 1);
             Trace.endSection();
 
             // Run the inference call.
