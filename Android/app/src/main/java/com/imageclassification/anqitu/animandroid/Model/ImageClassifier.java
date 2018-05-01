@@ -12,6 +12,9 @@ import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Vector;
 
 public class ImageClassifier implements Classifier {
@@ -34,7 +37,7 @@ public class ImageClassifier implements Classifier {
     private Vector<String> labels = new Vector<String>();
     private int[] intValues;
     private float[] pixels;
-    private float[] outputs;
+    private float[] probs;
     private String[] outputNames;
 
     private boolean logStats = false;
@@ -96,16 +99,16 @@ public class ImageClassifier implements Classifier {
         c.outputNames = new String[] {outputName};
         c.intValues = new int[inputSize * inputSize];
         c.pixels = new float[inputSize * inputSize * 3];
-        c.outputs = new float[numClasses];
+        c.probs = new float[numClasses];
 
         return c;
     }
 
 
     @Override
-    public Classification recognizeImage(Bitmap bitmap) {
+    public ArrayList<LabelProb> recognizeImage(Bitmap bitmap) {
 
-        Classification ans = new Classification();
+        ArrayList<LabelProb> labelProbs = new ArrayList<>();
 
         Trace.beginSection("recognizeImage");
 
@@ -133,22 +136,36 @@ public class ImageClassifier implements Classifier {
 
             // Copy the output Tensor back into the output array.
             Trace.beginSection("fetch");
-            inferenceInterface.fetch(outputName, outputs);
+            inferenceInterface.fetch(outputName, probs);
             Trace.endSection();
 
-            for (int i = 0; i < outputs.length; ++i) {
-                System.out.println(outputs[i]);
+
+
+            for (int i = 0; i < probs.length; ++i) {
+                System.out.println(probs[i]);
                 System.out.println(labels.get(i));
-                if (outputs[i] > ans.getConf()) {
-                    ans.update(outputs[i], labels.get(i));
-                }
+                labelProbs.add(new LabelProb(probs[i], labels.get(i)));
             }
+
+            Collections.sort(labelProbs, new Comparator<LabelProb>() {
+                @Override
+                public int compare(LabelProb o1, LabelProb o2) {
+                    return Float.compare(o2.getProb(), o1.getProb());
+                }
+            });
+
+
+            for (int i = 0; i < probs.length; ++i) {
+                System.out.println(labelProbs.get(i).getProb());
+                System.out.println(labelProbs.get(i).getLabel());
+            }
+
         } catch (Exception e){
             Log.i("TAG", "Some exception " + e);
             e.printStackTrace(System.out);
-            ans.update(0.0f, "Error getPixels" + e);
+//            ans.update(0.0f, "Error getPixels" + e);
         }
-        return ans;
+        return labelProbs;
     }
 
 

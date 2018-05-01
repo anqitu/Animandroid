@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,14 +17,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.imageclassification.anqitu.animandroid.Model.Classification;
+import com.imageclassification.anqitu.animandroid.Model.LabelProb;
 import com.imageclassification.anqitu.animandroid.Model.Classifier;
 import com.imageclassification.anqitu.animandroid.Model.ImageClassifier;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -43,7 +45,10 @@ public class MainActivity extends AppCompatActivity {
     private Executor executor = Executors.newSingleThreadExecutor();
     private TextView textViewResult;
     private Button btnDetectObject, btnTakePhoto, btnImportPhoto;
-    private ImageView imageView;
+    private ImageView photoView, imageView, matchView;
+    private LinearLayout photoLayout, resultLayout;
+
+    Bitmap photoBitmap;
 
     public final static int REQUEST_CAMERA = 1;
     public final static int REQUEST_GALLERY = 2;
@@ -54,11 +59,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        photoLayout = findViewById(R.id.linearLayoutPhoto);
+        resultLayout = findViewById(R.id.linearLayoutResult);
+        photoView = findViewById(R.id.photoView);
         imageView = findViewById(R.id.imageView);
+        matchView = findViewById(R.id.matchView);
         textViewResult = findViewById(R.id.textViewResult);
         btnImportPhoto = findViewById(R.id.btnImportPhoto);
         btnTakePhoto = findViewById(R.id.btnTakePhoto);
         btnDetectObject = findViewById(R.id.btnDetectObject);
+
+        setGetPhotoView();
 
         addEvents();
 
@@ -98,25 +109,26 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        setGetPhotoView();
+
         super.onActivityResult(requestCode, resultCode, data);
-        Bitmap bitmap = null;
         switch(requestCode){
             case REQUEST_CAMERA:
                 if(resultCode == Activity.RESULT_OK) {
-                    bitmap = handlePhotoFromCamera(data);
+                    photoBitmap = handlePhotoFromCamera(data);
                 }
                 break;
             case REQUEST_GALLERY:
                 if(resultCode == Activity.RESULT_OK) {
-                    bitmap = handlePhotoFromGallery(data);
+                    photoBitmap = handlePhotoFromGallery(data);
                 }
                 break;
         }
 
 
 
-        if (bitmap != null) {
-            imageView.setImageBitmap((bitmap));
+        if (photoBitmap != null) {
+            photoView.setImageBitmap((photoBitmap));
             System.out.println("imageView is set with bitmap of taken photo");
         } else {
             System.out.println("Null Bitmap");
@@ -152,30 +164,39 @@ public class MainActivity extends AppCompatActivity {
         Intent galleryImportIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryImportIntent.setType("image/*");
         startActivityForResult(galleryImportIntent, REQUEST_GALLERY);
-        textViewResult.setText("");
     }
 
     private void getPictureFromCamera(){
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, REQUEST_CAMERA);
-        textViewResult.setText("");
     }
 
     private void detectObject(){
+
+        setResultView();
+
         try{
-            BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+            BitmapDrawable drawable = (BitmapDrawable) photoView.getDrawable();
             Bitmap bitmap = drawable.getBitmap();
 
             String text = "";
 
-            final Classification res = classifier.recognizeImage(bitmap);
-            if (res.getLabel() == null) {
+            ArrayList<LabelProb> labelProbs = classifier.recognizeImage(bitmap);
+
+
+            if (labelProbs == null) {
                 text += ": ?\n";
             } else {
-                text += String.format("%s (Similarity: %f)", res.getLabel(), res.getConf());
+                for (int i = 0; i < 3; ++i) {
+                    text += String.format("%s (Similarity: %.2f) \n", labelProbs.get(i).getLabel(), labelProbs.get(i).getProb());
+                }
             }
+
+            imageView.setImageBitmap((photoBitmap));
+            matchView.setImageDrawable(getMatchedImage(labelProbs.get(0).getLabel()));
             textViewResult.setText(text);
-        }catch(Exception e){
+
+        } catch (Exception e) {
             Log.i("TAG", "Some exception " + e);
             e.printStackTrace(System.out);
             textViewResult.setText(R.string.error_message);
@@ -212,4 +233,40 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    public void setGetPhotoView() {
+        photoLayout.setVisibility(View.VISIBLE);
+        resultLayout.setVisibility(View.GONE);
+        textViewResult.setVisibility((View.GONE));
+    }
+
+
+
+    public void setResultView() {
+        photoLayout.setVisibility(View.GONE);
+        resultLayout.setVisibility(View.VISIBLE);
+        textViewResult.setVisibility((View.VISIBLE));
+    }
+
+    public Drawable getMatchedImage (String label) {
+        switch (label) {
+            case "Brave Tiger":
+                return getDrawable(R.drawable.tiger);
+            case "Curious Cat":
+                return getDrawable(R.drawable.cat);
+            case "Cute Koala":
+                return getDrawable(R.drawable.koala);
+            case "Lovely Rabbit":
+                return getDrawable(R.drawable.rabbit);
+            case "Loyal Dog":
+                return getDrawable(R.drawable.dog);
+            case "Powerful Lion":
+                return getDrawable(R.drawable.lion);
+            case "Smart Fox":
+                return getDrawable(R.drawable.fox);
+        }
+        return getDrawable(R.drawable.dog);
+    }
+
+
 }

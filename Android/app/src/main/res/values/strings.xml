@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Animandroid</string>
     <string name="error_message">Error Detecting</string>
+    <string name="photo_launcher">Photo Launcher</string>
+    <string name="photo_recognized">Photo Recognized</string>
+    <string name="text_result">Result</string>
+    <string name="detect">Detect</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="gallery">Gallery</string>
 </resources>

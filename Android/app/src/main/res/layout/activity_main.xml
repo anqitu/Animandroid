@@ -11,68 +11,125 @@
     tools:context=".MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
-
-    <TextView
-        android:id="@+id/textViewResult"
-        android:layout_width="340dp"
-        android:layout_height="40dp"
+    <LinearLayout
+        android:id="@+id/linearLayoutPhoto"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:fadeScrollbars="false"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
         android:gravity="center"
-        android:maxLines="15"
-        android:scrollbars="vertical"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayoutButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="340dp"
-        android:layout_height="340dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="#94bdcb"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toTopOf="@+id/textViewResult"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </ImageView>
+
+        <ImageView
+            android:id="@+id/photoView"
+            android:layout_width="340dp"
+            android:layout_height="400dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/dog"
+            android:contentDescription="@string/photo_launcher"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutResult"
+        android:layout_width="0dp"
+        android:layout_height="241dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/textViewResult"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_weight="0.5"
+            android:adjustViewBounds="false"
+            android:background="@drawable/dog"
+            android:contentDescription="@string/photo_recognized"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/matchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_weight="0.5"
+            android:adjustViewBounds="false"
+            android:background="@drawable/dog"
+            android:contentDescription="@string/photo_recognized"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageView>
+
+
+    </LinearLayout>
 
 
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="340dp"
+        android:id="@+id/linearLayoutButton"
+        android:layout_width="0dp"
         android:layout_height="45dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewResult">
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/btnImportPhoto"
+            style="@android:style/Widget.Button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:text="Gallery"
+            android:text="@string/gallery"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -82,6 +139,7 @@
 
         <Button
             android:id="@+id/btnTakePhoto"
+            style="@android:style/Widget.Button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="bottom|center"
@@ -89,7 +147,7 @@
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:text="Take Photo"
+            android:text="@string/take_photo"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -98,6 +156,7 @@
 
         <Button
             android:id="@+id/btnDetectObject"
+            style="@android:style/Widget.Button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="bottom|center"
@@ -105,13 +164,29 @@
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:text="Detect"
+            android:text="@string/detect"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             app:layout_constraintBaseline_toBaselineOf="@+id/btnTakePhoto"
             app:layout_constraintStart_toStartOf="parent" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="0dp"
+        android:layout_height="113dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:contentDescription="@string/text_result"
+        android:fontFamily="@font/actor"
+        android:lineSpacingExtra="8sp"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayoutButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>
