@@ -5,3 +5,7 @@ A simple Android application to deploy a keras model which can detect animals. T
 You can clone the repository to your laptop to build the apk on [Android Studio](https://developer.android.com/studio/) or download the apk from the [APK folder](https://github.com/anqitu/Animandroid/tree/master/APK), then install on your phone to play.
 
 The keras model deployed is built on pretraind [VGG16 keras model](https://github.com/keras-team/keras/blob/master/keras/applications/vgg16.py).
+
+## Exmaple Output
+![PredictAnimal](https://github.com/anqitu/Animandroid/blob/master/Screenshots/Screenshot_2018-05-01-07-07-21-72.png)
+![PredictHuman](https://github.com/anqitu/Animandroid/blob/master/Screenshots/Screenshot_2018-05-01-07-35-44-45.png)
