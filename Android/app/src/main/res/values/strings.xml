@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Animandroid</string>
+    <string name="error_message">Error Detecting</string>
 </resources>

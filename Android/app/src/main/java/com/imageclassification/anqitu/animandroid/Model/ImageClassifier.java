@@ -2,6 +2,7 @@ package com.imageclassification.anqitu.animandroid.Model;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Trace;
 import android.util.Log;
 
@@ -61,8 +62,6 @@ public class ImageClassifier implements Classifier {
             String modelFilename,
             String labelFilename,
             int inputSize,
-//            int imageMean,
-//            float imageStd,
             String inputName,
             String outputName) {
         ImageClassifier c = new ImageClassifier();
@@ -91,12 +90,7 @@ public class ImageClassifier implements Classifier {
         final int numClasses = (int) operation.output(0).shape().size(1);
         Log.i(TAG, "Read " + c.labels.size() + " labels, output layer size is " + numClasses);
 
-        // Ideally, inputSize could have been retrieved from the shape of the input operation.  Alas,
-        // the placeholder node for input in the graphdef typically used does not specify a shape, so it
-        // must be passed in as a parameter.
         c.inputSize = inputSize;
-//        c.imageMean = imageMean;
-//        c.imageStd = imageStd;
 
         // Pre-allocate buffers.
         c.outputNames = new String[] {outputName};
@@ -110,53 +104,82 @@ public class ImageClassifier implements Classifier {
 
     @Override
     public Classification recognizeImage(Bitmap bitmap) {
+
+        Classification ans = new Classification();
+
         Trace.beginSection("recognizeImage");
 
         Trace.beginSection("preprocessBitmap");
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        for (int i = 0; i < intValues.length; ++i) {
-            final int val = intValues[i];
-            System.out.println(val);
-//            floatValues[i * 3 + 0] = (((val >> 16) & 0xFF) - imageMean) / imageStd;
-//            floatValues[i * 3 + 1] = (((val >> 8) & 0xFF) - imageMean) / imageStd;
-//            floatValues[i * 3 + 2] = ((val & 0xFF) - imageMean) / imageStd;
 
-            pixels[i * 3 + 0] = (((val >> 16) & 0xFF) / 255.0f);
-            pixels[i * 3 + 1] = (((val >> 8) & 0xFF) / 255.0f);
-            pixels[i * 3 + 2] = ((val & 0xFF) / 255.0f);
+        System.out.println("bitmap.getWidth()");
+        System.out.println(bitmap.getWidth());
+        System.out.println("bitmap.getHeight()");
+        System.out.println(bitmap.getHeight());
 
-            System.out.println(pixels[i * 3 + 0]);
-        }
+        try {
+            bitmap = getResizedBitmap(bitmap, 150, 150);
+            bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+            for (int i = 0; i < intValues.length; ++i) {
+                final int val = intValues[i];
+//                System.out.println(val);
 
-        Trace.endSection();
+                pixels[i * 3 + 0] = (((val >> 16) & 0xFF) / 255.0f);
+                pixels[i * 3 + 1] = (((val >> 8) & 0xFF) / 255.0f);
+                pixels[i * 3 + 2] = ((val & 0xFF) / 255.0f);
 
-        // Copy the input data into TensorFlow.
-        Trace.beginSection("feed");
-        inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 3);
-//        inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 1);
-        Trace.endSection();
-
-        // Run the inference call.
-        Trace.beginSection("run");
-        inferenceInterface.run(outputNames, logStats);
-        Trace.endSection();
-
-        // Copy the output Tensor back into the output array.
-        Trace.beginSection("fetch");
-        inferenceInterface.fetch(outputName, outputs);
-        Trace.endSection();
-
-
-        Classification ans = new Classification();
-        for (int i = 0; i < outputs.length; ++i) {
-            System.out.println(outputs[i]);
-            System.out.println(labels.get(i));
-            if (outputs[i] > ans.getConf()) {
-                ans.update(outputs[i], labels.get(i));
+//                System.out.println(pixels[i * 3 + 0]);
             }
+
+
+            Trace.endSection();
+
+            // Copy the input data into TensorFlow.
+            Trace.beginSection("feed");
+            inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 3);
+    //        inferenceInterface.feed(inputName, pixels, 1, inputSize, inputSize, 1);
+            Trace.endSection();
+
+            // Run the inference call.
+            Trace.beginSection("run");
+            inferenceInterface.run(outputNames, logStats);
+            Trace.endSection();
+
+            // Copy the output Tensor back into the output array.
+            Trace.beginSection("fetch");
+            inferenceInterface.fetch(outputName, outputs);
+            Trace.endSection();
+
+            for (int i = 0; i < outputs.length; ++i) {
+                System.out.println(outputs[i]);
+                System.out.println(labels.get(i));
+                if (outputs[i] > ans.getConf()) {
+                    ans.update(outputs[i], labels.get(i));
+                }
+            }
+        } catch (Exception e){
+            Log.i("TAG", "Some exception " + e);
+            e.printStackTrace(System.out);
+            ans.update(0.0f, "Error getPixels" + e);
         }
         return ans;
     }
+
+
+    public static Bitmap getResizedBitmap(Bitmap image, int newHeight, int newWidth) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(image, 0, 0, width, height,
+                matrix, false);
+        return resizedBitmap;
+    }
+
 
 
     @Override
@@ -164,51 +187,4 @@ public class ImageClassifier implements Classifier {
         inferenceInterface.close();
         inferenceInterface = null;
     }
-
-//    private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
-//        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(BATCH_SIZE * inputSize * inputSize * PIXEL_SIZE);
-//        byteBuffer.order(ByteOrder.nativeOrder());
-//        int[] intValues = new int[inputSize * inputSize];
-//        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-//        int pixel = 0;
-//        for (int i = 0; i < inputSize; ++i) {
-//            for (int j = 0; j < inputSize; ++j) {
-//                final int val = intValues[pixel++];
-//                byteBuffer.put((byte) ((val >> 16) & 0xFF));
-//                byteBuffer.put((byte) ((val >> 8) & 0xFF));
-//                byteBuffer.put((byte) (val & 0xFF));
-//            }
-//        }
-//        return byteBuffer;
-//    }
-
-//    private List<Recognition> getSortedResult(byte[][] labelProbArray) {
-//
-//        PriorityQueue<Recognition> pq =
-//                new PriorityQueue<>(
-//                        MAX_RESULTS,
-//                        new Comparator<Recognition>() {
-//                            @Override
-//                            public int compare(Recognition lhs, Recognition rhs) {
-//                                return Float.compare(rhs.getConfidence(), lhs.getConfidence());
-//                            }
-//                        });
-//
-//        for (int i = 0; i < labels.size(); ++i) {
-//            float confidence = (labelProbArray[0][i] & 0xff) / 255.0f;
-//            if (confidence > THRESHOLD) {
-//                pq.add(new Recognition("" + i,
-//                        labels.size() > i ? labels.get(i) : "unknown",
-//                        confidence));
-//            }
-//        }
-//
-//        final ArrayList<Recognition> recognitions = new ArrayList<>();
-//        int recognitionsSize = Math.min(pq.size(), MAX_RESULTS);
-//        for (int i = 0; i < recognitionsSize; ++i) {
-//            recognitions.add(pq.poll());
-//        }
-//
-//        return recognitions;
-//    }
 }

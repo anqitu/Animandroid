@@ -64,6 +64,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewResult">
 
+        <Button
+            android:id="@+id/btnImportPhoto"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:text="Gallery"
+            android:textAllCaps="false"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnClearScreen"
+            app:layout_constraintStart_toEndOf="@+id/btnDetectObject" />
+
 
         <Button
             android:id="@+id/btnTakePhoto"
@@ -72,12 +87,13 @@
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
             android:text="Take Photo"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnClearScreen"
+            app:layout_constraintEnd_toStartOf="@+id/btnImportPhoto"
             app:layout_constraintStart_toEndOf="@+id/btnDetectObject" />
 
         <Button
