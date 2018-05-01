@@ -7,5 +7,5 @@ You can clone the repository to your laptop to build the apk on [Android Studio]
 The keras model deployed is built on pretraind [VGG16 keras model](https://github.com/keras-team/keras/blob/master/keras/applications/vgg16.py).
 
 ## Exmaple Output
-![PredictAnimal](https://github.com/anqitu/Animandroid/blob/master/Screenshots/Screenshot_2018-05-01-07-07-21-72.png)
-![PredictHuman](https://github.com/anqitu/Animandroid/blob/master/Screenshots/Screenshot_2018-05-01-07-35-44-45.png)
+<img src="https://github.com/anqitu/Animandroid/blob/master/Screenshots/Screenshot_2018-05-01-07-07-21-72.png" width="300">
+<img src="https://github.com/anqitu/Animandroid/blob/master/Screenshots/Screenshot_2018-05-01-07-35-44-45.png" width="300">
