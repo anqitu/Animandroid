@@ -1,4 +1,4 @@
-Animandroid
+## Animandroid
 
 A simple Android application to deploy a keras model which can detect animals. There are currently 7 animals in the v1.2. If you want to build your own keras model or find out how to build a keras model for image categorization, you can go to my another repo [What-animal-are-you](https://github.com/anqitu/What-animal-are-you).
 
